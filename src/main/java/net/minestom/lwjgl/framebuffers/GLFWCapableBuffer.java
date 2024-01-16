@@ -12,6 +12,8 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.ByteBuffer;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
@@ -72,6 +74,30 @@ public abstract class GLFWCapableBuffer {
         GL.createCapabilities();
     }
 
+    public Task setupLoop(long millis, Runnable rendering) {
+        return MinecraftServer.getSchedulerManager()
+                .buildTask(new Runnable() {
+                    private boolean first = true;
+
+                    @Override
+                    public void run() {
+                        if(first) {
+                            changeRenderingThreadToCurrent();
+                            first = false;
+                        }
+                        render(rendering);
+                    }
+                })
+                .repeat(millis, ChronoUnit.MILLIS )
+                .schedule();
+    }
+
+    /**
+     * @deprecated Please use setupLoop instead.
+     * 
+     * This method can be used, but the input period will be interpreted as milli seconds
+     */
+    @Deprecated
     public Task setupRenderLoop(long period, TimeUnit unit, Runnable rendering) {
         return MinecraftServer.getSchedulerManager()
                 .buildTask(new Runnable() {
@@ -86,7 +112,7 @@ public abstract class GLFWCapableBuffer {
                         render(rendering);
                     }
                 })
-                .repeat(period, unit)
+                .repeat(period, ChronoUnit.MILLIS )
                 .schedule();
     }
 
