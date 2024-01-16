@@ -4,7 +4,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.map.Framebuffer;
 import net.minestom.server.map.MapColors;
 import net.minestom.server.timer.Task;
-import net.minestom.server.utils.thread.ThreadBindingExecutor;
+import net.minestom.server.utils.time.TimeUnit;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -12,10 +12,9 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.ByteBuffer;
-import java.time.Duration;
-import java.time.temporal.TemporalUnit;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.opengl.GL11.*;
 
 public abstract class GLFWCapableBuffer {
@@ -27,8 +26,6 @@ public abstract class GLFWCapableBuffer {
     private final int height;
     private final ByteBuffer colorsBuffer;
     private boolean onlyMapColors;
-
-    private static ThreadBindingExecutor threadBindingPool;
 
     protected GLFWCapableBuffer(int width, int height) {
         this(width, height, GLFW_NATIVE_CONTEXT_API, GLFW_OPENGL_API);
@@ -63,12 +60,6 @@ public abstract class GLFWCapableBuffer {
                 throw new RuntimeException("("+errcode+") Failed to create GLFW Window.");
             }
         }
-
-        synchronized(GLFWCapableBuffer.class) {
-            if(threadBindingPool == null) {
-                threadBindingPool = new ThreadBindingExecutor(MinecraftServer.THREAD_COUNT_SCHEDULER, MinecraftServer.THREAD_NAME_SCHEDULER);
-            }
-        }
     }
 
     public GLFWCapableBuffer unbindContextFromThread() {
@@ -81,28 +72,21 @@ public abstract class GLFWCapableBuffer {
         GL.createCapabilities();
     }
 
-    public Task setupRenderLoop(long period, TemporalUnit unit, Runnable rendering) {
-        return setupRenderLoop(Duration.of(period, unit), rendering);
-    }
-
-    public Task setupRenderLoop(Duration period, Runnable rendering) {
+    public Task setupRenderLoop(long period, TimeUnit unit, Runnable rendering) {
         return MinecraftServer.getSchedulerManager()
                 .buildTask(new Runnable() {
                     private boolean first = true;
-                    private final Runnable subAction = () -> {
+
+                    @Override
+                    public void run() {
                         if(first) {
                             changeRenderingThreadToCurrent();
                             first = false;
                         }
                         render(rendering);
-                    };
-
-                    @Override
-                    public void run() {
-                        threadBindingPool.execute(subAction);
                     }
                 })
-                .repeat(period)
+                .repeat(period, unit)
                 .schedule();
     }
 
@@ -114,7 +98,7 @@ public abstract class GLFWCapableBuffer {
 
     /**
      * Called in render after glFlush to read the pixel buffer contents and convert it to map colors.
-     * Only call if you do not use {@link #render(Runnable)} nor {@link #setupRenderLoop}
+     * Only call if you do not use {@link #render(Runnable)} nor {@link #setupRenderLoop(long, TimeUnit, Runnable)}
      */
     public void prepareMapColors() {
         if(onlyMapColors) {
