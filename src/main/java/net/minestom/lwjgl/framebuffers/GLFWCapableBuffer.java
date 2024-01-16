@@ -57,7 +57,7 @@ public abstract class GLFWCapableBuffer {
 
         this.glfwWindow = glfwCreateWindow(width, height, "", 0L, 0L);
         if(glfwWindow == 0L) {
-            try(var stack = MemoryStack.stackPush()) {
+            try(MemoryStack stack = MemoryStack.stackPush()) {
                 PointerBuffer desc = stack.mallocPointer(1);
                 int errcode = glfwGetError(desc);
                 throw new RuntimeException("("+errcode+") Failed to create GLFW Window.");
