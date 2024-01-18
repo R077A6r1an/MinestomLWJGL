@@ -201,6 +201,17 @@
           <target>1.8</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.6.3</version>
+        <configuration>
+          <doctitle>${project.name} ${project.version} API</doctitle>
+          <windowtitle>${project.name} ${project.version} API</windowtitle>
+          <testDoctitle>${project.name} ${project.version} API</testDoctitle>
+          <testWindowtitle>${project.name} ${project.version} API</testWindowtitle>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>
