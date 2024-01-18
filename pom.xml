@@ -210,6 +210,12 @@
           <windowtitle>${project.name} ${project.version} API</windowtitle>
           <testDoctitle>${project.name} ${project.version} API</testDoctitle>
           <testWindowtitle>${project.name} ${project.version} API</testWindowtitle>
+          <links>
+            <link>https://docs.oracle.com/en/java/javase/17/docs/api</link>
+            <link>https://javadoc.minestom.net</link>
+            <link>https://javadoc.lwjgl.org</link>
+            <link>https://jd.advntr.dev/api/4.12.0</link>
+          </links>
         </configuration>
       </plugin>
     </plugins>
