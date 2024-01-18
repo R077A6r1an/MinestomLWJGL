@@ -51,10 +51,23 @@ public class MapColorRenderer implements Runnable {
     private float paletteSize;
     private final int screenQuadVAO;
 
+    /**
+     * Constructor for the map color renderer.
+     *
+     * @param framebuffer The target framebuffer
+     * @param renderCode The function for rendering
+     */
     public MapColorRenderer(GLFWCapableBuffer framebuffer, Runnable renderCode) {
         this(framebuffer, renderCode, MapColorRenderer.defaultFramebuffer(framebuffer.width(), framebuffer.height()));
     }
 
+    /**
+     * Constructor for the map color renderer.
+     *
+     * @param framebuffer The target framebuffer
+     * @param renderCode The Runnable for the rendering loop
+     * @param fboInitialization The initialization
+     */
     public MapColorRenderer(GLFWCapableBuffer framebuffer, Runnable renderCode, FboInitialization fboInitialization) {
         this.framebuffer = framebuffer;
         this.framebuffer.useMapColors();
@@ -140,6 +153,9 @@ public class MapColorRenderer implements Runnable {
         return colorTexture;
     }
 
+    /**
+     * Overwritten Runnable function for the render loop.
+     */
     @Override
     public void run() {
         glViewport(0, 0, width, height);
@@ -240,12 +256,15 @@ public class MapColorRenderer implements Runnable {
         return shader;
     }
 
+    /**
+     * Interface for the Framebuffer initialization.
+     */
     @FunctionalInterface
     public interface FboInitialization {
 
         /**
          * Initializes the given framebuffer
-         * @param fboId
+         * @param fboId The framebuffer id
          * @return the texture ID of the color texture, used for post processing.
          */
         int initFbo(int fboId);

@@ -30,17 +30,29 @@ public class GLFWFramebuffer extends GLFWCapableBuffer implements Framebuffer {
     private final byte[] colors = new byte[WIDTH*HEIGHT];
     private final ByteBuffer pixels = BufferUtils.createByteBuffer(WIDTH*HEIGHT*4);
 
+    /**
+     * Constructor for a GLFW framebuffer. Initializes the framebuffer with default bindings to OpenGL and
+     * native context api.
+     */
     public GLFWFramebuffer() {
         this(GLFW_NATIVE_CONTEXT_API, GLFW_OPENGL_API);
     }
 
     /**
      * Creates the framebuffer and initializes a new context
+     *
+     * @param apiContext The api context to init, for example GLFW_NATIVE_CONTEXT_API
+     * @param clientAPI The render client api, for example for OpenGL use GLFW_OPENGL_API
      */
     public GLFWFramebuffer(int apiContext, int clientAPI) {
         super(WIDTH, HEIGHT, apiContext, clientAPI);
     }
 
+    /**
+     * Maps the colors.
+     *
+     * @return byte[] The array with the colors
+     */
     @Override
     public byte[] toMapColors() {
         return colors;
