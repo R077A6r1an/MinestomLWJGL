@@ -13,7 +13,6 @@
   </properties>
   <distributionManagement>
     <downloadUrl>https://github.com/R077A6r1an/MinestomLWJGL.git</downloadUrl>
-    <status>deployed</status>
   </distributionManagement>
   <profiles>
     <profile>
